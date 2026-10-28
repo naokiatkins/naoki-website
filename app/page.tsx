@@ -1,25 +1,16 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import WorkSection from "@/components/WorkSection";
-import JDGate from "@/components/JDGate";
+import JDGate, { type AnalysisResult } from "@/components/JDGate";
 
 export default function Home() {
-  const [matchResult, setMatchResult] = useState<{
-    score: number;
-    summary: string;
-    skills: string[];
-    gaps: string[];
-    token: string;
-} | null>(null);
+  const [matchResult, setMatchResult] = useState<AnalysisResult | null>(null);
 
-  const threshold = Number(
-    process.env.NEXT_PUBLIC_MATCH_THRESHOLD ?? 70
-  );
-
-  const isHighMatch = matchResult !== null && matchResult.score >= threshold;
+  const isHighMatch =
+    matchResult !== null && matchResult.score >= matchResult.threshold;
 
   return (
     <main className="min-h-screen">
@@ -44,14 +35,13 @@ export default function Home() {
 
           <JDGate onResult={setMatchResult} result={matchResult} />
 
-          {isHighMatch && (
-    <div className="max-w-4xl mx-auto mt-10">
-      <CalendarEmbed token={matchResult.token} />
-    </div>
-  )}
+          {isHighMatch && <BookingLink bookingUrl={matchResult.bookingUrl} />}
 
           {matchResult && !isHighMatch && (
-            <LowMatchMessage score={matchResult.score} threshold={threshold} />
+            <LowMatchMessage
+              score={matchResult.score}
+              threshold={matchResult.threshold}
+            />
           )}
         </div>
       </section>
@@ -65,19 +55,14 @@ export default function Home() {
   );
 }
 
-function CalendarEmbed({ token }: { token: string }) {
-  const calendlyUrl = process.env.NEXT_PUBLIC_CALENDLY_URL;
-
-  if (!calendlyUrl) {
+function BookingLink({ bookingUrl }: { bookingUrl: string | null }) {
+  if (!bookingUrl) {
     return (
       <div className="mt-10 p-6 border border-ink/10 rounded text-center text-muted font-mono text-sm">
         Set <code>NEXT_PUBLIC_CALENDLY_URL</code> in your env vars.
       </div>
     );
   }
-
-  // Append token as a custom answer so you can identify who booked
-  const embedUrl = `${calendlyUrl}?a1=${token}`;
 
   return (
     <div className="mt-10 animate-fade-up">
@@ -87,12 +72,15 @@ function CalendarEmbed({ token }: { token: string }) {
           Great match — book a call
         </p>
       </div>
-      <iframe
-        src={embedUrl}
-        className="calendar-frame w-full rounded-sm"
-        height="700"
-        title="Book a call"
-      />
+      <a
+        href={bookingUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block font-mono text-sm border border-ink px-6 py-3 hover:bg-ink hover:text-cream transition-colors duration-200"
+      >
+        Book a call on Calendly ↗
+      </a>
+      <p className="mt-3 font-mono text-xs text-muted">Opens in a new tab</p>
     </div>
   );
 }
