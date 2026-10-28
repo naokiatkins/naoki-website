@@ -125,7 +125,7 @@ export default function JDGate({ onResult, result }: Props) {
 
 function LoadingState() {
   return (
-    <div className="rounded-xl bg-cream p-6 space-y-4 animate-fade-in">
+    <div className="rounded-xl bg-cream/80 backdrop-blur-[2px] p-6 space-y-4 animate-fade-in">
       <p className="text-sm font-medium">Reading your JD…</p>
       <div className="skeleton h-4 rounded-full w-3/4" />
       <div className="skeleton h-4 rounded-full w-1/2" />
@@ -154,7 +154,7 @@ function ResultCard({
       : "text-muted";
 
   return (
-    <div className="rounded-xl bg-cream p-6 space-y-6 animate-fade-up">
+    <div className="rounded-xl bg-cream/80 backdrop-blur-[2px] p-6 space-y-6 animate-fade-up">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">

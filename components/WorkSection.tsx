@@ -16,7 +16,7 @@ export default function WorkSection() {
 
       <div className="space-y-6">
         {projects.map((p) => (
-          <article key={p.title} className="rounded-2xl bg-sand p-6 md:p-10">
+          <article key={p.title} className="rounded-2xl bg-sand/80 backdrop-blur-[2px] p-6 md:p-10">
             <div className="flex flex-wrap items-center gap-3 text-sm text-muted mb-4">
               <span className="rounded-full bg-cream px-3 py-0.5">{p.year}</span>
               <span>{p.role}</span>

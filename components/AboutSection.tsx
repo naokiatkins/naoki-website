@@ -19,12 +19,12 @@ export default function AboutSection() {
             </p>
             <p>
               My stack centres on Python, SQL, and Power BI. I care equally
-              about code quality and the humans who use what I ship.
+              about code quality and the people who use what I ship.
             </p>
           </div>
         </div>
 
-        <dl className="self-start rounded-2xl bg-sand px-6 py-2 text-sm">
+        <dl className="self-start rounded-2xl bg-sand/80 backdrop-blur-[2px] px-6 py-2 text-sm">
           {stats.map((s) => (
             <div
               key={s.label}
