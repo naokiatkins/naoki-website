@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
+import ExperienceSection from "@/components/ExperienceSection";
 import WorkSection from "@/components/WorkSection";
 import JDGate, { type AnalysisResult } from "@/components/JDGate";
 
@@ -24,6 +25,7 @@ export default function Home() {
       <main>
         <HeroSection />
         <AboutSection />
+        <ExperienceSection />
         <WorkSection />
 
         {/* ── The gate ── */}
