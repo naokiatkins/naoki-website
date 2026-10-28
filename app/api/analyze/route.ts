@@ -12,7 +12,7 @@ Years of experience: 5
 
 Core skills:
 - Power BI, Python, R, SQL
-- Azure -> Blob Storage, Functions, Apps
+- Azure -> Blob Storage, Functions, Apps, Data Factory
 - RPA, Machine Learning
 - Software design, Software architecture
 
