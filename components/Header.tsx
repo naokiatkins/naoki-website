@@ -12,6 +12,9 @@ export default function Header() {
           <a href="#experience" className="hidden sm:inline text-muted hover:text-ink transition-colors">
             Experience
           </a>
+          <a href="#certificates" className="hidden sm:inline text-muted hover:text-ink transition-colors">
+            Certificates
+          </a>
           <a href="#work" className="hidden sm:inline text-muted hover:text-ink transition-colors">
             Work
           </a>
