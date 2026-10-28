@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
@@ -6,6 +6,7 @@ import { put } from "@vercel/blob";
 import { neon } from "@neondatabase/serverless";
 import { extractText } from "unpdf";
 import crypto from "crypto";
+import { notifyDiscord, visitorLocation } from "@/lib/discord";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -236,6 +237,16 @@ export async function POST(req: NextRequest) {
       url.searchParams.set("a1", token);
       bookingUrl = url.toString();
     }
+
+    // Runs after the response is sent, so Discord never slows the recruiter down
+    const location = visitorLocation(req);
+    after(() =>
+      notifyDiscord(
+        process.env.DISCORD_UPLOADS_WEBHOOK_URL,
+        `📄 JD uploaded · ${file.name.slice(0, 80)} · score ${score}/100 · ` +
+          `${bookingUrl ? "booking link shown" : "below threshold"} · ${location}`
+      )
+    );
 
     return NextResponse.json({
       score,
