@@ -14,7 +14,7 @@ body {
 
 /* Drop zone */
 .drop-zone {
-  @apply border-[1.5px] border-dashed border-muted/50 bg-cream transition-colors;
+  @apply border-[1.5px] border-dashed border-muted/50 bg-cream/80 backdrop-blur-[2px] transition-colors;
 }
 .drop-zone.active {
   @apply border-rust bg-rust/5;
