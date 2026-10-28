@@ -1,7 +1,7 @@
 const certifications = [
   {
     name: "JLPT N1",
-    issuer: "Japanese Language Proficiency Test",
+    issuer: "Japanese Foundation",
     dates: "Jan 2025",
   },
   {
