@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
@@ -15,6 +15,21 @@ const DataScene = dynamic(() => import("@/components/DataScene"), { ssr: false }
 
 export default function Home() {
   const [matchResult, setMatchResult] = useState<AnalysisResult | null>(null);
+
+  // One Discord ping per browser session, not per refresh
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("visit-pinged")) return;
+      sessionStorage.setItem("visit-pinged", "1");
+    } catch {
+      // Storage blocked: ping anyway
+    }
+    fetch("/api/visit", {
+      method: "POST",
+      body: JSON.stringify({ referrer: document.referrer }),
+      keepalive: true,
+    }).catch(() => {});
+  }, []);
 
   const isHighMatch =
     matchResult !== null && matchResult.score >= matchResult.threshold;
