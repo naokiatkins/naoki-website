@@ -14,7 +14,7 @@ export default function AboutSection() {
             About
           </p>
           <p className="font-display text-2xl md:text-3xl text-ink leading-snug mb-6">
-            I build products people actually want to use.
+            I create trustworthy data in the backend, and intuitive reports in the frontend. 
           </p>
           <p className="text-muted leading-relaxed mb-4">
             Five years in, I&apos;ve worked with the titles of business intelligence developer, 

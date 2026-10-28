@@ -63,9 +63,3 @@ body::before {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
-
-/* Calendar iframe */
-.calendar-frame {
-  border: none;
-  border-radius: 4px;
-}

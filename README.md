@@ -1,21 +1,20 @@
 # Portfolio — JD-gated booking site
 
-A portfolio website where recruiters must upload a job description PDF. Claude scores the match against your profile, and only unlocks your Google Calendar booking embed if the score meets your threshold.
+A portfolio website where recruiters upload a job description PDF. Claude scores the match against your profile, and the server only hands out your Calendly booking link if the score meets your threshold. Every submission is logged to Postgres, and the PDF is kept in private Blob storage.
 
-## Tech stack & cost
+## Tech stack
 
-| Thing | Service | Cost |
-|---|---|---|
-| Hosting + CI/CD | Vercel free tier | $0 |
-| AI analysis | Anthropic Claude Haiku | ~$0.001 per analysis |
-| Calendar booking | Google Calendar embed | $0 |
-| Domain | Your own | $0 extra |
-
-**Estimated running cost: < $1/month** even with heavy recruiter traffic.
+| Thing | Service |
+|---|---|
+| Hosting + CI/CD | Vercel |
+| AI analysis | Anthropic Claude Haiku 5.5 |
+| Submission log | Neon Postgres (Vercel Storage) |
+| PDF storage | Vercel Blob (private) |
+| Booking | Calendly (opens in a new tab) |
 
 ---
 
-## Setup in 5 steps
+## Setup
 
 ### 1. Clone & install
 
@@ -25,22 +24,18 @@ cd portfolio
 npm install
 ```
 
-### 2. Get your Anthropic API key
+### 2. Create the storage
 
-- Go to [console.anthropic.com](https://console.anthropic.com)
-- Create an account (free credits included)
-- Create an API key under "API Keys"
+In the Vercel dashboard, under **Storage**:
 
-### 3. Get your Google Calendar embed URL
+1. Create a **Neon Postgres** database and connect it to the project. This sets `POSTGRES_URL`.
+2. Create a **Blob** store and connect it to the project. This sets `BLOB_READ_WRITE_TOKEN`.
+3. Open the database's **Query** tab and run [`lib/schema.sql`](lib/schema.sql).
 
-1. Open [Google Calendar](https://calendar.google.com)
-2. Click the gear → **Settings**
-3. Under **My calendars**, click your calendar name
-4. Scroll to **Integrate calendar**
-5. Copy the **Public URL** or the `src` value from the embed `<iframe>`
-6. Make sure the calendar is set to **public** (same settings page)
+### 3. Set up Calendly
 
-> **Tip**: Create a separate Google Calendar just for recruiter bookings so it only shows times you've blocked off for interviews.
+1. Create the event recruiters should book.
+2. Add a custom question to the event and make it the **first** question (e.g. "Reference"). The site prefills it with the submission token, so each booking links back to the JD that unlocked it.
 
 ### 4. Configure environment variables
 
@@ -48,28 +43,11 @@ npm install
 cp .env.example .env.local
 ```
 
-Edit `.env.local`:
-
-```env
-ANTHROPIC_API_KEY=sk-ant-...
-NEXT_PUBLIC_GOOGLE_CALENDAR_EMBED_URL=https://calendar.google.com/calendar/embed?src=...
-NEXT_PUBLIC_MATCH_THRESHOLD=70
-```
+Fill in every value in `.env.local` (see [`.env.example`](.env.example) for what each one is), then add the same keys in Vercel → **Settings** → **Environment Variables**. To pull the storage values Vercel created, run `vercel env pull .env.local`.
 
 ### 5. Personalise your profile
 
-Open `app/api/analyze/route.ts` and edit the `MY_PROFILE` constant at the top:
-
-```ts
-const MY_PROFILE = `
-Name: Your Name
-Title: ...
-Core skills: ...
-...
-`;
-```
-
-Also update the placeholder text in:
+Edit the `MY_PROFILE` constant at the top of `app/api/analyze/route.ts`, plus:
 - `components/HeroSection.tsx` — name, links, tagline
 - `components/AboutSection.tsx` — bio, stats
 - `components/WorkSection.tsx` — projects
@@ -85,30 +63,26 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
----
+## Deploy
 
-## Deploy to Vercel
+Push to GitHub; Vercel deploys every push. To deploy from the CLI instead:
 
 ```bash
-npm i -g vercel
-vercel
+npx vercel
 ```
-
-Then in the Vercel dashboard:
-1. Go to your project → **Settings** → **Environment Variables**
-2. Add all three variables from `.env.local`
-3. Add your custom domain under **Domains**
-
-That's it — Vercel auto-deploys on every `git push`.
 
 ---
 
 ## Adjusting the match threshold
 
-The `NEXT_PUBLIC_MATCH_THRESHOLD` env var (default: `70`) controls when the calendar unlocks. Set it to:
-- `60` — more open (unlocks for decent-fit roles)
+`MATCH_THRESHOLD` (default `70`) controls when the booking link unlocks. It is read on the server, so changing it needs a redeploy.
+- `60` — more open
 - `75` — more selective
-- `85` — very selective (only near-perfect matches)
+- `85` — only near-perfect matches
+
+## Looking up submissions
+
+[`lib/queries.sql`](lib/queries.sql) has saved queries for the Neon query console: find a submission by the token from a Calendly booking, list the latest submissions, and list recent strong matches.
 
 ---
 
@@ -118,22 +92,17 @@ The `NEXT_PUBLIC_MATCH_THRESHOLD` env var (default: `70`) controls when the cale
 Recruiter uploads PDF
         ↓
 POST /api/analyze
-  1. Validate file (PDF, <5MB)
-  2. Extract text with pdf-parse
-  3. Send to Claude Haiku with your profile
-  4. Parse JSON response: {score, summary, skills, gaps}
+  1. Validate file (PDF, <5 MB)
+  2. Rate-limit: max 5 uploads per IP per hour
+  3. Extract text with unpdf
+  4. Score with Claude Haiku (structured JSON: score, summary, skills, gaps)
+  5. Store the PDF in private Blob storage and log the submission to Postgres
+     (storage failures are logged, never shown to the recruiter)
+  6. score >= MATCH_THRESHOLD → return the Calendly link with the token
         ↓
-Client receives result
-  score >= threshold → show Google Calendar iframe
-  score < threshold  → show low-match message
+Client shows the result
+  bookingUrl present → "Book a call" link that opens Calendly in a new tab
+  otherwise          → low-match message
 ```
 
-The analysis is **stateless** — nothing is stored. Each upload is analysed fresh.
-
----
-
-## Customisation ideas
-
-- **Add rate limiting**: Use [Upstash Redis](https://upstash.com) (free tier) to limit analyses per IP
-- **Add email notification**: Use [Resend](https://resend.com) (free tier) to get notified when someone uploads a JD
-- **Password-protect** the result with a short code so only recruiters you've spoken to can unlock it
+The booking link never ships in the client bundle; a visitor only receives it after a passing score.

@@ -2,11 +2,13 @@
 
 import { useCallback, useRef, useState } from "react";
 
-interface AnalysisResult {
+export interface AnalysisResult {
   score: number;
+  threshold: number;
   summary: string;
   skills: string[];
   gaps: string[];
+  bookingUrl: string | null;
 }
 
 interface Props {
@@ -21,7 +23,6 @@ export default function JDGate({ onResult, result }: Props) {
   const [fileName, setFileName] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
-  const threshold = Number(process.env.NEXT_PUBLIC_MATCH_THRESHOLD ?? 70);
 
   const analyse = useCallback(
     async (file: File) => {
@@ -84,7 +85,7 @@ export default function JDGate({ onResult, result }: Props) {
     return (
       <ResultCard
         result={result}
-        threshold={threshold}
+        threshold={result.threshold}
         fileName={fileName}
         onReset={() => {
           setState("idle");
