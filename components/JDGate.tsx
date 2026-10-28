@@ -12,11 +12,11 @@ export interface AnalysisResult {
 }
 
 interface Props {
-  onResult: (result: AnalysisResult) => void;
+  onResult: (result: AnalysisResult | null) => void;
   result: AnalysisResult | null;
 }
 
-type State = "idle" | "dragging" | "loading" | "done" | "error";
+type State = "idle" | "dragging" | "loading" | "error";
 
 export default function JDGate({ onResult, result }: Props) {
   const [state, setState] = useState<State>("idle");
@@ -48,7 +48,7 @@ export default function JDGate({ onResult, result }: Props) {
           throw new Error(data.error ?? "Unknown error");
         }
         onResult(data);
-        setState("done");
+        setState("idle");
       } catch (e: unknown) {
         setErrorMsg(e instanceof Error ? e.message : "Analysis failed.");
         setState("error");
@@ -81,17 +81,10 @@ export default function JDGate({ onResult, result }: Props) {
   // ── Render ──────────────────────────────────────────────────────────────
   if (state === "loading") return <LoadingState />;
 
-  if (state === "done" && result) {
+  if (result) {
+    // Clearing the parent's result also hides the booking link / low-match message
     return (
-      <ResultCard
-        result={result}
-        threshold={result.threshold}
-        fileName={fileName}
-        onReset={() => {
-          setState("idle");
-          setFileName("");
-        }}
-      />
+      <ResultCard result={result} fileName={fileName} onReset={() => onResult(null)} />
     );
   }
 
@@ -150,15 +143,14 @@ function LoadingState() {
 
 function ResultCard({
   result,
-  threshold,
   fileName,
   onReset,
 }: {
   result: AnalysisResult;
-  threshold: number;
   fileName: string;
   onReset: () => void;
 }) {
+  const { threshold } = result;
   const isMatch = result.score >= threshold;
   const scoreColor =
     result.score >= 80

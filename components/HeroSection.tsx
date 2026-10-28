@@ -1,5 +1,3 @@
-"use client";
-
 export default function HeroSection() {
   return (
     <section className="flex flex-col justify-start pt-32 pb-20 px-6 relative overflow-hidden">

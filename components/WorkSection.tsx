@@ -7,22 +7,6 @@ const projects = [
       "Designed and implemented a web application to calculate ERC tax credits for small businesses. Built the backend API, data processing pipeline, and frontend interface.",
     tags: ["Python", "Flask", "Azure Blob Storage", "Azure SQL", "GitHub Actions"],
   },
-  // {
-  //   year: "2023",
-  //   title: "Developer Analytics SaaS",
-  //   role: "Founding Engineer",
-  //   description:
-  //     "Built a B2B SaaS from scratch to $200k ARR. Designed the data pipeline, dashboard UI, and billing integration.",
-  //   tags: ["Next.js", "Python", "Stripe", "Clickhouse"],
-  // },
-  // {
-  //   year: "2022",
-  //   title: "Open-Source Component Library",
-  //   role: "Creator & Maintainer",
-  //   description:
-  //     "Shipped a design-system library for React. 2k+ GitHub stars, used by 300+ projects.",
-  //   tags: ["React", "TypeScript", "Storybook"],
-  // },
 ];
 
 export default function WorkSection() {
