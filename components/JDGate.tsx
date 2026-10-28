@@ -12,11 +12,11 @@ export interface AnalysisResult {
 }
 
 interface Props {
-  onResult: (result: AnalysisResult) => void;
+  onResult: (result: AnalysisResult | null) => void;
   result: AnalysisResult | null;
 }
 
-type State = "idle" | "dragging" | "loading" | "done" | "error";
+type State = "idle" | "dragging" | "loading" | "error";
 
 export default function JDGate({ onResult, result }: Props) {
   const [state, setState] = useState<State>("idle");
@@ -48,7 +48,7 @@ export default function JDGate({ onResult, result }: Props) {
           throw new Error(data.error ?? "Unknown error");
         }
         onResult(data);
-        setState("done");
+        setState("idle");
       } catch (e: unknown) {
         setErrorMsg(e instanceof Error ? e.message : "Analysis failed.");
         setState("error");
@@ -81,17 +81,10 @@ export default function JDGate({ onResult, result }: Props) {
   // ── Render ──────────────────────────────────────────────────────────────
   if (state === "loading") return <LoadingState />;
 
-  if (state === "done" && result) {
+  if (result) {
+    // Clearing the parent's result also hides the booking link / low-match message
     return (
-      <ResultCard
-        result={result}
-        threshold={result.threshold}
-        fileName={fileName}
-        onReset={() => {
-          setState("idle");
-          setFileName("");
-        }}
-      />
+      <ResultCard result={result} fileName={fileName} onReset={() => onResult(null)} />
     );
   }
 
@@ -105,7 +98,7 @@ export default function JDGate({ onResult, result }: Props) {
         onDragLeave={onDragLeave}
         onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
         onClick={() => inputRef.current?.click()}
-        className={`drop-zone rounded-sm p-12 text-center cursor-pointer select-none ${
+        className={`drop-zone rounded-xl px-6 py-12 text-center cursor-pointer select-none ${
           state === "dragging" ? "active" : ""
         }`}
       >
@@ -116,17 +109,15 @@ export default function JDGate({ onResult, result }: Props) {
           className="hidden"
           onChange={onFileChange}
         />
-        <div className="mb-4 text-3xl opacity-40">⬆</div>
-        <p className="font-display text-xl text-ink mb-2">
-          Drop your job description here
-        </p>
-        <p className="font-mono text-xs text-muted">
-          PDF only · max 5 MB · analysed privately
+        <div className="mb-3 text-2xl text-muted" aria-hidden>⬆</div>
+        <p className="text-lg font-medium mb-1">Drop your job description here</p>
+        <p className="text-sm text-muted">
+          or click to browse · PDF only · max 5 MB · analysed privately
         </p>
       </div>
 
       {state === "error" && (
-        <p className="mt-4 font-mono text-xs text-rust">{errorMsg}</p>
+        <p className="mt-4 text-sm text-rust">{errorMsg}</p>
       )}
     </div>
   );
@@ -134,31 +125,26 @@ export default function JDGate({ onResult, result }: Props) {
 
 function LoadingState() {
   return (
-    <div className="py-12 space-y-4 animate-fade-in">
-      <p className="font-mono text-xs tracking-widest text-muted uppercase">
-        Reading your JD…
-      </p>
-      <div className="skeleton h-4 rounded w-3/4" />
-      <div className="skeleton h-4 rounded w-1/2" />
-      <div className="skeleton h-4 rounded w-2/3" />
-      <p className="font-mono text-xs text-muted mt-6">
-        This takes ~5 seconds
-      </p>
+    <div className="rounded-xl bg-cream p-6 space-y-4 animate-fade-in">
+      <p className="text-sm font-medium">Reading your JD…</p>
+      <div className="skeleton h-4 rounded-full w-3/4" />
+      <div className="skeleton h-4 rounded-full w-1/2" />
+      <div className="skeleton h-4 rounded-full w-2/3" />
+      <p className="text-sm text-muted pt-2">This takes ~5 seconds</p>
     </div>
   );
 }
 
 function ResultCard({
   result,
-  threshold,
   fileName,
   onReset,
 }: {
   result: AnalysisResult;
-  threshold: number;
   fileName: string;
   onReset: () => void;
 }) {
+  const { threshold } = result;
   const isMatch = result.score >= threshold;
   const scoreColor =
     result.score >= 80
@@ -168,20 +154,16 @@ function ResultCard({
       : "text-muted";
 
   return (
-    <div className="animate-fade-up space-y-6">
+    <div className="rounded-xl bg-cream p-6 space-y-6 animate-fade-up">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="font-mono text-xs tracking-widest text-muted uppercase mb-1">
-            Analysis complete
-          </p>
-          <p className="font-mono text-xs text-ink/50 truncate max-w-xs">
-            {fileName}
-          </p>
+        <div className="min-w-0">
+          <p className="text-sm font-medium">Analysis complete</p>
+          <p className="text-sm text-muted truncate">{fileName}</p>
         </div>
         <button
           onClick={onReset}
-          className="font-mono text-xs text-muted underline underline-offset-4 hover:text-ink transition-colors flex-shrink-0"
+          className="flex-shrink-0 rounded-full bg-sand px-4 py-1.5 text-sm hover:bg-ink/10 transition-colors"
         >
           Try another
         </button>
@@ -190,10 +172,10 @@ function ResultCard({
       {/* Score bar */}
       <div>
         <div className="flex items-end justify-between mb-2">
-          <span className="font-display text-lg text-ink">Match score</span>
-          <span className={`font-display text-4xl font-bold ${scoreColor}`}>
+          <span className="font-medium">Match score</span>
+          <span className={`text-4xl font-semibold tracking-tight ${scoreColor}`}>
             {result.score}
-            <span className="text-xl font-normal">/100</span>
+            <span className="text-xl font-normal text-muted">/100</span>
           </span>
         </div>
         <div className="h-1.5 bg-ink/10 rounded-full overflow-hidden">
@@ -202,26 +184,19 @@ function ResultCard({
             style={{ width: `${result.score}%` }}
           />
         </div>
-        <p className="mt-1 font-mono text-xs text-muted">
-          Calendar unlocks at {threshold}+
-        </p>
+        <p className="mt-2 text-sm text-muted">Calendar unlocks at {threshold}+</p>
       </div>
 
       {/* Summary */}
-      <p className="text-ink/80 leading-relaxed">{result.summary}</p>
+      <p className="font-serif text-lg leading-relaxed text-ink/85">{result.summary}</p>
 
       {/* Skills matched */}
       {result.skills.length > 0 && (
         <div>
-          <p className="font-mono text-xs tracking-widest text-muted uppercase mb-3">
-            Matched skills
-          </p>
+          <p className="text-sm font-medium mb-3">Matched skills</p>
           <div className="flex flex-wrap gap-2">
             {result.skills.map((s) => (
-              <span
-                key={s}
-                className="font-mono text-xs px-3 py-1 border border-ink/15 rounded-full text-ink/70"
-              >
+              <span key={s} className="rounded-full bg-sand px-3 py-1 text-xs text-ink/70">
                 {s}
               </span>
             ))}
@@ -232,14 +207,11 @@ function ResultCard({
       {/* Gaps */}
       {result.gaps.length > 0 && !isMatch && (
         <div>
-          <p className="font-mono text-xs tracking-widest text-muted uppercase mb-3">
-            Potential gaps
-          </p>
-          <ul className="space-y-1">
+          <p className="text-sm font-medium mb-3">Potential gaps</p>
+          <ul className="text-sm text-muted divide-y divide-ink/10">
             {result.gaps.map((g) => (
-              <li key={g} className="font-mono text-xs text-muted flex gap-2">
-                <span>—</span>
-                <span>{g}</span>
+              <li key={g} className="py-2">
+                {g}
               </li>
             ))}
           </ul>

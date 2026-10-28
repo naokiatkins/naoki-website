@@ -68,10 +68,6 @@ ${MY_PROFILE}
 
 const client = new Anthropic();
 
-function getSql() {
-  return process.env.POSTGRES_URL ? neon(process.env.POSTGRES_URL) : null;
-}
-
 async function scoreWithClaude(jdText: string) {
   const message = await client.messages.parse({
     model: "claude-haiku-5-5",
@@ -124,7 +120,7 @@ export async function POST(req: NextRequest) {
       "unknown";
     const userAgent = req.headers.get("user-agent") ?? "unknown";
 
-    const sql = getSql();
+    const sql = process.env.POSTGRES_URL ? neon(process.env.POSTGRES_URL) : null;
     if (!sql) {
       console.warn("POSTGRES_URL is not set; skipping rate limit and storage.");
     } else if (ip !== "unknown") {
@@ -147,7 +143,8 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 2. Extract text from PDF ──────────────────────────────────────────────
-    const buffer = Buffer.from(await file.arrayBuffer());    let jdText = "";
+    const buffer = Buffer.from(await file.arrayBuffer());
+    let jdText = "";
 
     try {
       // Copy the bytes: pdf.js may detach the array it's given, and `buffer` is reused for the Blob upload
