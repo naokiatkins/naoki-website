@@ -11,41 +11,34 @@ const projects = [
 
 export default function WorkSection() {
   return (
-    <section className="py-24 px-6 border-t border-ink/10 bg-ink/[0.02]">
-      <div className="max-w-4xl mx-auto">
-        <p className="font-mono text-xs tracking-widest text-muted uppercase mb-12">
-          Selected work
-        </p>
+    <section id="work" className="max-w-5xl mx-auto px-6 py-16 md:py-24">
+      <h2 className="text-2xl font-semibold tracking-tight mb-8">Selected work</h2>
 
-        <div className="space-y-0 divide-y divide-ink/10">
-          {projects.map((p) => (
-            <div
-              key={p.title}
-              className="py-10 grid md:grid-cols-[120px_1fr] gap-4 md:gap-10 group"
-            >
-              <div className="font-mono text-xs text-muted pt-1">{p.year}</div>
-              <div>
-                <div className="flex flex-wrap items-baseline gap-3 mb-2">
-                  <h3 className="font-display text-xl text-ink">{p.title}</h3>
-                  <span className="font-mono text-xs text-muted">{p.role}</span>
-                </div>
-                <p className="text-muted leading-relaxed mb-4">
-                  {p.description}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {p.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="font-mono text-xs px-2.5 py-0.5 border border-ink/10 text-ink/50 rounded-full"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
+      <div className="space-y-6">
+        {projects.map((p) => (
+          <article key={p.title} className="rounded-2xl bg-sand p-6 md:p-10">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-muted mb-4">
+              <span className="rounded-full bg-cream px-3 py-0.5">{p.year}</span>
+              <span>{p.role}</span>
             </div>
-          ))}
-        </div>
+            <h3 className="text-xl md:text-2xl font-semibold tracking-tight mb-3">
+              {p.title}
+            </h3>
+            <p className="font-serif text-lg leading-relaxed text-ink/85 max-w-3xl mb-6">
+              {p.description}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {p.tags.map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full bg-cream px-3 py-1 text-xs text-ink/70"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </article>
+        ))}
       </div>
     </section>
   );

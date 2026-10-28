@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import { Inter, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
+
+const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const serif = Source_Serif_4({ subsets: ["latin"], variable: "--font-serif" });
 
 export const metadata: Metadata = {
   title: "Naoki Atkins — Portfolio",
@@ -17,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className={`${sans.variable} ${serif.variable}`}>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import WorkSection from "@/components/WorkSection";
@@ -13,74 +14,70 @@ export default function Home() {
     matchResult !== null && matchResult.score >= matchResult.threshold;
 
   return (
-    <main className="min-h-screen">
-      <HeroSection />
-      <AboutSection />
-      <WorkSection />
+    <>
+      <Header />
+      <main>
+        <HeroSection />
+        <AboutSection />
+        <WorkSection />
 
-      {/* ── The gate ── */}
-      <section id="book" className="py-24 px-6">
-        <div className="max-w-2xl mx-auto">
-          <p className="font-mono text-xs tracking-widest text-muted uppercase mb-4">
-            Work with me
-          </p>
-          <h2 className="font-display text-4xl md:text-5xl text-ink mb-6 leading-tight">
-            Are we a fit?
-          </h2>
-          <p className="text-muted leading-relaxed mb-12 max-w-lg">
-            Upload your job description. I&apos;ll analyse it against my
-            background and — if there&apos;s a strong match — unlock my
-            calendar so we can talk.
-          </p>
+        {/* ── The gate ── */}
+        <section id="book" className="max-w-5xl mx-auto px-6 py-16 md:py-24">
+          <div className="rounded-2xl bg-sand p-6 md:p-12">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-semibold tracking-tight mb-4">
+                Are we a fit?
+              </h2>
+              <p className="font-serif text-lg leading-relaxed text-ink/85 mb-10">
+                Upload your job description. I&apos;ll analyse it against my
+                background and — if there&apos;s a strong match — unlock my
+                calendar so we can talk.
+              </p>
 
-          <JDGate onResult={setMatchResult} result={matchResult} />
+              <JDGate onResult={setMatchResult} result={matchResult} />
 
-          {isHighMatch && <BookingLink bookingUrl={matchResult.bookingUrl} />}
+              {isHighMatch && <BookingLink bookingUrl={matchResult.bookingUrl} />}
 
-          {matchResult && !isHighMatch && (
-            <LowMatchMessage
-              score={matchResult.score}
-              threshold={matchResult.threshold}
-            />
-          )}
-        </div>
-      </section>
+              {matchResult && !isHighMatch && (
+                <LowMatchMessage
+                  score={matchResult.score}
+                  threshold={matchResult.threshold}
+                />
+              )}
+            </div>
+          </div>
+        </section>
+      </main>
 
-      <footer className="border-t border-ink/10 py-8 px-6 text-center">
-        <p className="font-mono text-xs text-muted">
+      <footer className="border-t border-ink/10">
+        <div className="max-w-5xl mx-auto px-6 py-8 text-sm text-muted">
           © {new Date().getFullYear()} Naoki Atkins
-        </p>
+        </div>
       </footer>
-    </main>
+    </>
   );
 }
 
 function BookingLink({ bookingUrl }: { bookingUrl: string | null }) {
   if (!bookingUrl) {
     return (
-      <div className="mt-10 p-6 border border-ink/10 rounded text-center text-muted font-mono text-sm">
+      <div className="mt-8 rounded-xl bg-cream p-6 text-center text-sm text-muted">
         Set <code>NEXT_PUBLIC_CALENDLY_URL</code> in your env vars.
       </div>
     );
   }
 
   return (
-    <div className="mt-10 animate-fade-up">
-      <div className="flex items-center gap-3 mb-4">
-        <span className="w-2 h-2 rounded-full bg-rust animate-pulse" />
-        <p className="font-mono text-xs tracking-widest text-rust uppercase">
-          Great match — book a call
-        </p>
-      </div>
+    <div className="mt-8 animate-fade-up">
       <a
         href={bookingUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-block font-mono text-sm border border-ink px-6 py-3 hover:bg-ink hover:text-cream transition-colors duration-200"
+        className="block w-full rounded-full bg-ink text-cream text-center px-6 py-3.5 hover:bg-ink/85 transition-colors"
       >
-        Book a call on Calendly ↗
+        Book a call on Calendly →
       </a>
-      <p className="mt-3 font-mono text-xs text-muted">Opens in a new tab</p>
+      <p className="mt-3 text-center text-sm text-muted">Opens in a new tab</p>
     </div>
   );
 }
@@ -93,11 +90,8 @@ function LowMatchMessage({
   threshold: number;
 }) {
   return (
-    <div className="mt-8 p-6 border border-ink/10 rounded-sm animate-fade-up">
-      <p className="font-mono text-xs tracking-widest text-muted uppercase mb-2">
-        Match score: {score}/100
-      </p>
-      <p className="text-ink/70 leading-relaxed">
+    <div className="mt-8 rounded-xl bg-cream p-6 animate-fade-up">
+      <p className="font-serif text-lg leading-relaxed text-ink/85">
         This role looks like a {score}% match — my calendar unlocks at{" "}
         {threshold}%. That said, feel free to reach out via the links above if
         you think the fit is there.
