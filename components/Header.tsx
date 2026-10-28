@@ -6,11 +6,14 @@ export default function Header() {
           Naoki Atkins
         </a>
         <div className="flex items-center gap-4 sm:gap-6 text-sm">
-          <a href="#work" className="hidden sm:inline text-muted hover:text-ink transition-colors">
-            Work
-          </a>
           <a href="#about" className="hidden sm:inline text-muted hover:text-ink transition-colors">
             About
+          </a>
+          <a href="#experience" className="hidden sm:inline text-muted hover:text-ink transition-colors">
+            Experience
+          </a>
+          <a href="#work" className="hidden sm:inline text-muted hover:text-ink transition-colors">
+            Work
           </a>
           <a
             href="#book"
