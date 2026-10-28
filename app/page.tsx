@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import ExperienceSection from "@/components/ExperienceSection";
@@ -73,11 +74,13 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-ink/10">
-        <div className="max-w-5xl mx-auto px-6 py-8 text-sm text-muted">
-          © {new Date().getFullYear()} Naoki Atkins
-        </div>
-      </footer>
+      {/* proxy.ts redirects these paths to the photos. / music. subdomains of the current host */}
+      <Footer
+        links={[
+          { label: "Photos", href: "/photos" },
+          { label: "Music", href: "/music" },
+        ]}
+      />
     </>
   );
 }
