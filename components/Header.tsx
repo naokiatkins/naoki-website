@@ -5,7 +5,7 @@ const SECTION_LINKS: Link[] = [
   { label: "About", href: "#about" },
   { label: "Experience", href: "#experience" },
   { label: "Certificates", href: "#certificates" },
-  { label: "Work", href: "#work" },
+  { label: "Projects", href: "#work" },
 ];
 
 export default function Header({
