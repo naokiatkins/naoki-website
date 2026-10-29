@@ -12,7 +12,7 @@ const projects = [
 export default function WorkSection() {
   return (
     <section id="work" className="max-w-5xl mx-auto px-6 py-16 md:py-24">
-      <h2 className="text-2xl font-semibold tracking-tight mb-8">Selected work</h2>
+      <h2 className="text-2xl font-semibold tracking-tight mb-8">Projects</h2>
 
       <div className="space-y-6">
         {projects.map((p) => (
