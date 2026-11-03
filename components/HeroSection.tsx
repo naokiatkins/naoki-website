@@ -2,6 +2,7 @@ const links = [
   { label: "GitHub", href: "https://github.com/naokiatkins" },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/naoki-atkins/" },
   { label: "Email", href: "mailto:hello@naokiatkins.com" },
+  { label: "Résumé", href: "/resume.pdf" },
 ];
 
 export default function HeroSection() {
@@ -27,7 +28,7 @@ export default function HeroSection() {
             <a
               key={l.label}
               href={l.href}
-              {...(l.href.startsWith("http") && { target: "_blank", rel: "noopener noreferrer" })}
+              {...(!l.href.startsWith("mailto:") && { target: "_blank", rel: "noopener noreferrer" })}
               className="hover:text-ink transition-colors"
             >
               {l.label} ↗
